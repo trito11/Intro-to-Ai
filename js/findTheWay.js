@@ -145,8 +145,9 @@ function findPathDijkstra(start, end) {
     const resultPath = route.map((item) => {
         return { lat: item.data.x, lng: item.data.y };
     });
-    // resultPath.push(end);
-    // resultPath.unshift(start);
+
+    resultPath.push(start);
+    resultPath.unshift(end);
 
     // console.log(route[1].id)
     // console.log(resultPath)
