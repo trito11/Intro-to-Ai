@@ -199,12 +199,31 @@ function initMap() {
 
     // Search path
     document.querySelector("#btn-search-path").addEventListener("click", () => {
-        document.querySelector('#btn-search-path-astar').style.display = 'inline-block'
-        document.querySelector('#btn-search-path-xxx').style.display = 'inline-block'
+        let astar = document.querySelector('#btn-search-path-astar').style.display
+        document.querySelector('#btn-search-path-astar').style.display = (astar == 'inline-block') ? 'none' : 'inline-block'
+        let dijkstra = document.querySelector('#btn-search-path-dijkstra').style.display
+        document.querySelector('#btn-search-path-dijkstra').style.display = (dijkstra == 'inline-block') ? 'none' : 'inline-block'
     })
+    
     document.querySelector("#btn-search-path-astar").addEventListener("click", () => {
         if (pointEnd !== null && pointStart !== null) {
             const path = findPathAstar(pointStart, pointEnd);
+            node_passed = path;
+            drawPath(path);
+            siiimpleToast.success(`Suggest passing ${path.length - 2} Node`, {
+                duration: 4000,
+            });
+            pointStart = null
+            pointEnd = null
+        } else {
+            siiimpleToast.alert("Choose two points before finding your way", { duration: 4000 })
+        }
+    })
+
+
+    document.querySelector("#btn-search-path-dijkstra").addEventListener("click", () => {
+        if (pointEnd !== null && pointStart !== null) {
+            const path = findPathDijkstra(pointStart, pointEnd);
             node_passed = path;
             drawPath(path);
             siiimpleToast.success(`Suggest passing ${path.length - 2} Node`, {

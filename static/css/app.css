@@ -135,7 +135,7 @@ body {
     transition: 0.2s ease-in-out;
 }
 
-#btn-search-path-xxx {
+#btn-search-path-dijkstra {
     position: absolute;
     top: 150px;
     left: 280px;
@@ -155,7 +155,7 @@ body {
     align-items: center;
 }
 
-#btn-search-path-xxx:hover {
+#btn-search-path-dijkstra:hover {
     color: rgb(255, 255, 255);
     background: #2dff2a;
     transition: 0.2s ease-in-out;
