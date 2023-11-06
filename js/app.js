@@ -199,8 +199,12 @@ function initMap() {
 
     // Search path
     document.querySelector("#btn-search-path").addEventListener("click", () => {
+        document.querySelector('#btn-search-path-astar').style.display = 'inline-block'
+        document.querySelector('#btn-search-path-xxx').style.display = 'inline-block'
+    })
+    document.querySelector("#btn-search-path-astar").addEventListener("click", () => {
         if (pointEnd !== null && pointStart !== null) {
-            const path = findPath(pointStart, pointEnd);
+            const path = findPathAstar(pointStart, pointEnd);
             node_passed = path;
             drawPath(path);
             siiimpleToast.success(`Suggest passing ${path.length - 2} Node`, {

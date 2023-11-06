@@ -12,7 +12,7 @@ for (const [key, value] of Object.entries(listLink)) {
 }
 
 // Main function find path
-function findPath(start, end) {
+function findPathAstar(start, end) {
     startDetected = detectPosition(start);
     endDetected = detectPosition(end);
     startNode = findNearestNode(startDetected);

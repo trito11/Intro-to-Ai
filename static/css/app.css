@@ -108,3 +108,55 @@ body {
     background: #2dff2a;
     transition: 0.2s ease-in-out;
 }
+
+#btn-search-path-astar {
+    position: absolute;
+    top: 150px;
+    left: 200px;
+    z-index: 1000;
+    padding: 14px;
+    background: none padding-box #8eff8c;
+    color: black;
+    border: 0px;
+    margin: 0px;
+    cursor: pointer;
+    text-align: center;
+    vertical-align: middle;
+    font-size: 16px;
+    box-shadow: rgba(0, 0, 0, 0.3) 0px 1px 4px -1px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+}
+
+#btn-search-path-astar:hover {
+    color: rgb(255, 255, 255);
+    background: #2dff2a;
+    transition: 0.2s ease-in-out;
+}
+
+#btn-search-path-xxx {
+    position: absolute;
+    top: 150px;
+    left: 280px;
+    z-index: 1000;
+    padding: 14px;
+    background: none padding-box #8eff8c;
+    color: black;
+    border: 0px;
+    margin: 0px;
+    cursor: pointer;
+    text-align: center;
+    vertical-align: middle;
+    font-size: 16px;
+    box-shadow: rgba(0, 0, 0, 0.3) 0px 1px 4px -1px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+}
+
+#btn-search-path-xxx:hover {
+    color: rgb(255, 255, 255);
+    background: #2dff2a;
+    transition: 0.2s ease-in-out;
+}
