@@ -1,3 +1,5 @@
+const INF = 999;
+
 let GRAPH = {
     source: null, 
     mandatory: null, 
@@ -5,6 +7,7 @@ let GRAPH = {
     listNodes: [],
     listLinks: [],
 };
+
 
 function findSatisfactionPoint(node) {
     // find
@@ -148,9 +151,9 @@ function initGraph() {
     GRAPH.mandatory = [...listIDs];
 }
 
+/* -----------------------------------Algorithms----------------------------------- */
 function Floyd_Warshall() {
     /* ---------init--------- */
-    const INF = 9;
     const N = GRAPH.listNodes.length,
         SOURCE = GRAPH.source,
         DESTINATION = GRAPH.destination;
@@ -159,7 +162,7 @@ function Floyd_Warshall() {
     let W = new Array(N).fill(INF).map(() => new Array(N).fill(INF)),
         trace = new Array(N).fill(0).map(() => new Array(N).fill(0));
 
-    // W
+    // W, D
     for (let u=0; u<N; u++) {
         W[u][u] = 0;
         
@@ -172,26 +175,29 @@ function Floyd_Warshall() {
             ) ** 0.5
         }
     }
+    let D = JSON.parse(JSON.stringify(W));
 
     // trace
     for (let u = 0; u < N; u++)
         for (let v = 0; v < N; v++)
             trace[u][v] = u;
 
+
     /* -------implement------- */
     // Floyd-Warshall algorithm
     for (let k = 0; k < N; k++) {
         for (let u = 0; u < N; u++) {
             for (let v = 0; v < N; v++) {
-                if (W[u][v] > W[u][k] + W[k][v]) {
-                    W[u][v] = W[u][k] + W[k][v];
+                if (D[u][v] > D[u][k] + D[k][v]) {
+                    D[u][v] = D[u][k] + D[k][v];
                     trace[u][v] = trace[k][v];
                 }
             }
         }
     }
 
-    // permutation
+
+    /* ------permutation------ */
     let bestScene, minDistance = 9999999;
     var findBestScene = function(i, arr) {
         if (i === arr.length) {
@@ -199,7 +205,7 @@ function Floyd_Warshall() {
                 scene = [SOURCE, ...arr, DESTINATION]
 
             for (let k = 1; k < scene.length; k++)
-                distance += W[scene[k-1]][scene[k]];
+                distance += D[scene[k-1]][scene[k]];
 
             if(distance < minDistance) {
                 bestScene = scene;
@@ -222,7 +228,7 @@ function Floyd_Warshall() {
         let v = bestScene[k];
 
         path.push(v);
-        while (v != u) { // truy vết ngược từ v về u
+        while (v != u) { // trace back from v to u
             v = trace[u][v];
             if (v != u) path.push(v);
         }
@@ -232,3 +238,249 @@ function Floyd_Warshall() {
     return {distance: minDistance, path: path.reverse()};
 }
 
+
+function Dijkstra() {
+    /* ---------init--------- */
+    const N = GRAPH.listNodes.length,
+        SOURCE = GRAPH.source,
+        DESTINATION = GRAPH.destination;
+
+    let MANDATORY = JSON.parse(JSON.stringify(GRAPH.mandatory));
+    let W = new Array(N).fill(INF).map(() => new Array(N).fill(INF)),
+        trace = new Array(N).fill(0).map(() => new Array(N).fill(0));
+
+    // W, D
+    for (let u=0; u<N; u++) {
+        W[u][u] = 0;
+        
+        links = GRAPH.listLinks[u]
+        for (let k=0; k<links.length; k++) {
+            let v = links[k];
+            W[u][v] = (
+                (GRAPH.listNodes[u].lat - GRAPH.listNodes[v].lat) ** 2 +
+                (GRAPH.listNodes[u].lng - GRAPH.listNodes[v].lng) ** 2 
+            ) ** 0.5
+        }
+    }
+    let D = new Array(N).fill(INF).map(() => new Array(N).fill(INF));
+
+    // trace
+    for (let u = 0; u < N; u++)
+        for (let v = 0; v < N; v++)
+            trace[u][v] = u;
+
+
+    /* -------implement------- */
+    const dijkstra = function (S) {
+        let P = new Array(N).fill(false)
+        D[S][S] = 0;
+
+        for (let i = 0; i < N; i++) {
+            let uBest;
+            let Max = INF;
+            for (let u = 0; u < N; u++) {
+                if(D[S][u] < Max && P[u] === false) {
+                    uBest = u;
+                    Max = D[S][u];
+                }
+            }
+
+            let u = uBest;
+            P[u] = true;
+            links = GRAPH.listLinks[u];
+
+            for (let k=0; k<links.length; k++) {
+                let v = links[k];
+                if(D[S][v] > D[S][u] + W[u][v]) {
+                    D[S][v] = D[S][u] + W[u][v];
+                    trace[S][v] = u;
+                }
+            }
+        }
+    };
+
+    // Dijkstra algorithm
+    let scene = [SOURCE, ...MANDATORY, DESTINATION];
+    for (let k = 0; k < scene.length; k++)
+        dijkstra(scene[k]);
+
+
+    /* ------permutation------ */
+    let bestScene, minDistance = 9999999;
+    var findBestScene = function(i, arr) {
+        if (i === arr.length) {
+            let distance = 0,
+                scene = [SOURCE, ...arr, DESTINATION]
+
+            for (let k = 1; k < scene.length; k++)
+                distance += D[scene[k-1]][scene[k]];
+
+            if(distance < minDistance) {
+                bestScene = scene;
+                minDistance = distance;
+            }
+            return;
+        }
+        for (let j = i; j < arr.length; j++) {
+            [arr[i], arr[j]] = [arr[j], arr[i]];
+            findBestScene(i + 1, arr);
+            [arr[i], arr[j]] = [arr[j], arr[i]];
+        }
+    };      
+    findBestScene(0, MANDATORY)
+    
+    // trace
+    path = []
+    for (let k = bestScene.length - 1; k > 0; k--) {
+        let u = bestScene[k-1];
+        let v = bestScene[k];
+
+        path.push(v);
+        while (v != u) { // trace back from v to u
+            v = trace[u][v];
+            if (v != u) path.push(v);
+        }
+    }
+    path.push(bestScene[0]);
+    
+    return {distance: minDistance, path: path.reverse()};
+}
+
+
+function A_Star() {
+    /* ---------init--------- */
+    const N = GRAPH.listNodes.length,
+        SOURCE = GRAPH.source,
+        DESTINATION = GRAPH.destination;
+
+    let MANDATORY = JSON.parse(JSON.stringify(GRAPH.mandatory));
+    let W = new Array(N).fill(INF).map(() => new Array(N).fill(INF)),
+        trace = new Array(N).fill(0).map(() => new Array(N).fill(0));
+
+    // W, D
+    for (let u=0; u<N; u++) {
+        W[u][u] = 0;
+        
+        links = GRAPH.listLinks[u]
+        for (let k=0; k<links.length; k++) {
+            let v = links[k];
+            W[u][v] = (
+                (GRAPH.listNodes[u].lat - GRAPH.listNodes[v].lat) ** 2 +
+                (GRAPH.listNodes[u].lng - GRAPH.listNodes[v].lng) ** 2 
+            ) ** 0.5
+        }
+    }
+    let D = new Array(N).fill(INF).map(() => new Array(N).fill(INF));
+
+    // trace
+    for (let u = 0; u < N; u++)
+        for (let v = 0; v < N; v++)
+            trace[u][v] = u;
+
+
+    /* -------implement------- */
+    // heuristic function
+    let h = new Array(N).fill(INF).map(() => new Array(N).fill(INF));
+
+    for (let u=0; u<N; u++) {
+        h[u][u] = 0;
+        
+        links = GRAPH.listLinks[u]
+        for (let v=0; v<N; v++) {
+            h[u][v] =   // Manhattan distance
+                Math.abs(GRAPH.listNodes[u].lat - GRAPH.listNodes[v].lat) +
+                Math.abs(GRAPH.listNodes[u].lng - GRAPH.listNodes[v].lng)
+        }
+    }
+
+    const aStar = function (S, E) {
+        let P = new Array(N).fill(false)
+        let Q = [S];
+        D[S][S] = 0;
+
+        while(Q.length !== 0) {
+            let iBest;
+            let Max = INF;
+
+            for (let i = 0; i < Q.length; i++) {
+                let u = Q[i];
+
+                if(D[S][u] + h[u][E] < Max && P[u] === false) {
+                    iBest = i;
+                    Max = D[S][u] + h[u][E];
+                }
+            }
+    
+            let u = Q[iBest];
+            for (let i = 0; i < Q.length; i++)
+                if(Q[i] === u) Q.splice(i, 1);
+
+            P[u] = true;
+            links = GRAPH.listLinks[u];
+            
+            if(u === E) return;
+
+            for (let k=0; k<links.length; k++) {
+                let v = links[k];
+                if(P[v] === false) {
+                    if(D[S][v] > D[S][u] + W[u][v]) {
+                        D[S][v] = D[S][u] + W[u][v];
+                        trace[S][v] = u;
+                    }
+                    Q.push(v);
+                }
+            }
+        }
+    };
+
+    // A-Star algorithm
+    let scene = [SOURCE, ...MANDATORY, DESTINATION];
+    for (let i = 0; i < scene.length; i++)
+        for (let j = i + 1; j < scene.length; j++) {
+            aStar(scene[i], scene[j]);
+            aStar(scene[j], scene[i]);
+        }
+            
+
+    console.log(D);
+
+    /* ------permutation------ */
+    let bestScene, minDistance = 9999999;
+    var findBestScene = function(i, arr) {
+        if (i === arr.length) {
+            let distance = 0,
+                scene = [SOURCE, ...arr, DESTINATION]
+
+            for (let k = 1; k < scene.length; k++)
+                distance += D[scene[k-1]][scene[k]];
+
+            if(distance < minDistance) {
+                bestScene = scene;
+                minDistance = distance;
+            }
+            return;
+        }
+        for (let j = i; j < arr.length; j++) {
+            [arr[i], arr[j]] = [arr[j], arr[i]];
+            findBestScene(i + 1, arr);
+            [arr[i], arr[j]] = [arr[j], arr[i]];
+        }
+    };      
+    findBestScene(0, MANDATORY)
+    
+    // trace
+    path = []
+    for (let k = bestScene.length - 1; k > 0; k--) {
+        let u = bestScene[k-1];
+        let v = bestScene[k];
+
+        path.push(v);
+        while (v != u) { // trace back from v to u
+            v = trace[u][v];
+            if (v != u) path.push(v);
+        }
+    }
+    path.push(bestScene[0]);
+    
+    return {distance: minDistance, path: path.reverse()};
+}

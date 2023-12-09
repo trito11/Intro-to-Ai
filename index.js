@@ -10,18 +10,19 @@ document.getElementById('run').addEventListener("click", () => {
     initGraph();
     algorithm = document.getElementById('algorithm').value;
 
-    const start = Date.now();
+    const start = window.performance.now();
 
     let { distance, path } = 
-        (parseInt(algorithm) === 0) ?   { distance: null, path: null } :
-        (parseInt(algorithm) === 1) ?   Floyd_Warshall() : 
-        (parseInt(algorithm) === 2) ?   { distance: null, path: null } :
+        (parseInt(algorithm) === 0) ?   Floyd_Warshall() :
+        (parseInt(algorithm) === 1) ?   Dijkstra() : 
+        (parseInt(algorithm) === 2) ?   A_Star() :
                                         { distance: null, path: null } ;
-    const end = Date.now();
+    const end = window.performance.now();
 
     console.log('time: ', end - start, 'ms')
     console.log('path: ', path);
     console.log('distance: ', distance);
 
-    showPath(path, true);
+    if(distance < 9)
+        showPath(path, true);
 })
