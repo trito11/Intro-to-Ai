@@ -198,7 +198,7 @@ function Floyd_Warshall(dummyTSP) {
 
 
     /* ------dummyTSP------ */
-    const { minDistance, bestScene } =  (dummyTSP === 0) ? permutation(D, SOURCE, [...MANDATORY], DESTINATION) :
+    const { minDistance, bestScene } =  (dummyTSP === 0) ? completeSearch(D, SOURCE, [...MANDATORY], DESTINATION) :
                                         (dummyTSP === 1) ? BnB(D, SOURCE, [...MANDATORY], DESTINATION) : 
                                         (dummyTSP === 2) ? GA(D, SOURCE, [...MANDATORY], DESTINATION) :
                                         { distance: null, path: null };
@@ -288,7 +288,7 @@ function Dijkstra(dummyTSP) {
 
 
     /* ------dummyTSP------ */
-    const { minDistance, bestScene } =  (dummyTSP === 0) ? permutation(D, SOURCE, [...MANDATORY], DESTINATION) :
+    const { minDistance, bestScene } =  (dummyTSP === 0) ? completeSearch(D, SOURCE, [...MANDATORY], DESTINATION) :
                                         (dummyTSP === 1) ? BnB(D, SOURCE, [...MANDATORY], DESTINATION) : 
                                         (dummyTSP === 2) ? GA(D, SOURCE, [...MANDATORY], DESTINATION) :
                                         { distance: null, path: null };
@@ -406,7 +406,7 @@ function A_Star(dummyTSP) {
         }
 
     /* ------dummyTSP------ */
-    const { minDistance, bestScene } =  (dummyTSP === 0) ? permutation(D, SOURCE, [...MANDATORY], DESTINATION) :
+    const { minDistance, bestScene } =  (dummyTSP === 0) ? completeSearch(D, SOURCE, [...MANDATORY], DESTINATION) :
                                         (dummyTSP === 1) ? BnB(D, SOURCE, [...MANDATORY], DESTINATION) : 
                                         (dummyTSP === 2) ? GA(D, SOURCE, [...MANDATORY], DESTINATION) :
                                         { distance: null, path: null };

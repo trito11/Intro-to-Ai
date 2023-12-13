@@ -1,27 +1,66 @@
-function permutation(D, SOURCE, MANDATORY, DESTINATION) {
-    let bestScene, minDistance = 9999999;
+function completeSearch(D, SOURCE, MANDATORY, DESTINATION) {
+    /* ---------init DummyTSP--------- */
+    scene = [SOURCE, ...MANDATORY, DESTINATION]
+    const N = scene.length + 1,
+          adj = new Array(N).fill(INF).map(() => new Array(N).fill(INF));
 
-    var findBestScene = function(i, arr) {
-        if (i === arr.length) {
-            let distance = 0,
-                scene = [SOURCE, ...arr, DESTINATION]
+    for(let i = 0; i < N - 1; i++)
+        for(let j = 0; j < N - 1; j++)
+            if(i === j) adj[i][i] = 0
+            else adj[i][j] = D[scene[i]][scene[j]]  * 1000
 
-            for (let k = 1; k < scene.length; k++)
-                distance += D[scene[k-1]][scene[k]];
+    // Dummy Node
+    adj[N-2][N-1] = 0.1 * 1000;
+    adj[N-1][0] = 0.1 * 1000;
 
-            if(distance < minDistance) {
-                bestScene = scene;
-                minDistance = distance;
+    /* ---------TSP implement--------- */
+    const visited = new Array(N).fill(0),
+          x_best = new Array(N).fill(0),
+          x = new Array(N).fill(0);
+
+    let current_cost = 0,
+        best_cost = Number.MAX_SAFE_INTEGER;
+
+    function update_best_solution(current_cost)
+    {
+        if (current_cost + adj[x[N-1]][0] < best_cost)
+        {
+            best_cost = current_cost + adj[x[N-1]][0];
+    
+            for (let i = 0; i < N; ++i)
+                x_best[i] = x[i];
+        }
+    }
+    
+    function recursion(i)
+    {
+        for (let j = 1; j < N; ++j)
+            if (!visited[j]) 
+            {
+                x[i] = j;
+                visited[j] = 1;
+                current_cost += adj[x[i - 1]][x[i]];
+
+                if (i === N-1) update_best_solution(current_cost);
+                else recursion(i + 1);
+    
+                visited[j] = 0;
+                current_cost -= adj[x[i - 1]][x[i]];
             }
-            return;
-        }
-        for (let j = i; j < arr.length; j++) {
-            [arr[i], arr[j]] = [arr[j], arr[i]];
-            findBestScene(i + 1, arr);
-            [arr[i], arr[j]] = [arr[j], arr[i]];
-        }
-    };      
-    findBestScene(0, MANDATORY)
+    }
+
+    x[0] = 0;
+    visited[0] = 1;
+    recursion(1);
+
+    bestScene = [...x_best];
+    let minDistance = 0;
+    bestScene.pop()
+
+    for(let i = 0; i < bestScene.length; i++) {
+        bestScene[i] = scene[bestScene[i]]
+        if(i > 0) minDistance += D[bestScene[i-1]][bestScene[i]]
+    }
 
     return { minDistance, bestScene };
 }
@@ -65,9 +104,9 @@ function BnB(D, SOURCE, MANDATORY, DESTINATION) {
         }
     }
     
-    function branch_and_bound(i)
+    function recursion(i)
     {
-        if (current_cost > best_cost) return;
+        if (current_cost  > best_cost) return;
         // + Math.max((N-i - 2) * min_edge, 0)
         for (let j = 1; j < N; ++j)
             if (!visited[j]) 
@@ -77,7 +116,7 @@ function BnB(D, SOURCE, MANDATORY, DESTINATION) {
                 current_cost += adj[x[i - 1]][x[i]];
 
                 if (i === N-1) update_best_solution(current_cost);
-                else branch_and_bound(i + 1);
+                else recursion(i + 1);
     
                 visited[j] = 0;
                 current_cost -= adj[x[i - 1]][x[i]];
@@ -86,14 +125,16 @@ function BnB(D, SOURCE, MANDATORY, DESTINATION) {
 
     x[0] = 0;
     visited[0] = 1;
-    branch_and_bound(1);
+    recursion(1);
 
     bestScene = [...x_best];
+    let minDistance = 0;
     bestScene.pop()
-    let minDistance = (best_cost - 0.2 * 1000) / 1000;
     
-    for(let i = 0; i < bestScene.length; i++)
+    for(let i = 0; i < bestScene.length; i++) {
         bestScene[i] = scene[bestScene[i]]
+        if(i > 0) minDistance += D[bestScene[i-1]][bestScene[i]]
+    }
 
     return { minDistance, bestScene };
 }
@@ -253,10 +294,13 @@ function GA(D, SOURCE, MANDATORY, DESTINATION) {
         bestScene.push(firstElement)
     }
 
-    for(let i = 0; i < bestScene.length; i++)
-        bestScene[i] = scene[bestScene[i]]
-    
+    let minDistance = 0;
     bestScene.pop();
 
-    return { minDistance: bestTour.distance, bestScene };
+    for(let i = 0; i < bestScene.length; i++) {
+        bestScene[i] = scene[bestScene[i]]
+        if(i > 0) minDistance += D[bestScene[i-1]][bestScene[i]]
+    }
+
+    return { minDistance, bestScene };
 }
