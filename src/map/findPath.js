@@ -1,4 +1,4 @@
-const INF = 999;
+const INF = 99999;
 
 let GRAPH = {
     source: null, 
@@ -152,7 +152,7 @@ function initGraph() {
 }
 
 /* -----------------------------------Algorithms----------------------------------- */
-function Floyd_Warshall() {
+function Floyd_Warshall(dummyTSP) {
     /* ---------init--------- */
     const N = GRAPH.listNodes.length,
         SOURCE = GRAPH.source,
@@ -197,29 +197,11 @@ function Floyd_Warshall() {
     }
 
 
-    /* ------permutation------ */
-    let bestScene, minDistance = 9999999;
-    var findBestScene = function(i, arr) {
-        if (i === arr.length) {
-            let distance = 0,
-                scene = [SOURCE, ...arr, DESTINATION]
-
-            for (let k = 1; k < scene.length; k++)
-                distance += D[scene[k-1]][scene[k]];
-
-            if(distance < minDistance) {
-                bestScene = scene;
-                minDistance = distance;
-            }
-            return;
-        }
-        for (let j = i; j < arr.length; j++) {
-            [arr[i], arr[j]] = [arr[j], arr[i]];
-            findBestScene(i + 1, arr);
-            [arr[i], arr[j]] = [arr[j], arr[i]];
-        }
-    };      
-    findBestScene(0, MANDATORY)
+    /* ------dummyTSP------ */
+    const { minDistance, bestScene } =  (dummyTSP === 0) ? permutation(D, SOURCE, [...MANDATORY], DESTINATION) :
+                                        (dummyTSP === 1) ? BnB(D, SOURCE, [...MANDATORY], DESTINATION) : 
+                                        (dummyTSP === 2) ? GA(D, SOURCE, [...MANDATORY], DESTINATION) :
+                                        { distance: null, path: null };
 
     // trace
     path = []
@@ -234,12 +216,12 @@ function Floyd_Warshall() {
         }
     }
     path.push(bestScene[0]);
-    
-    return {distance: minDistance, path: path.reverse()};
+    path = path.reverse();
+        
+    return {distance: minDistance, path: path};
 }
 
-
-function Dijkstra() {
+function Dijkstra(dummyTSP) {
     /* ---------init--------- */
     const N = GRAPH.listNodes.length,
         SOURCE = GRAPH.source,
@@ -305,30 +287,11 @@ function Dijkstra() {
         dijkstra(scene[k]);
 
 
-    /* ------permutation------ */
-    let bestScene, minDistance = 9999999;
-    var findBestScene = function(i, arr) {
-        if (i === arr.length) {
-            let distance = 0,
-                scene = [SOURCE, ...arr, DESTINATION]
-
-            for (let k = 1; k < scene.length; k++)
-                distance += D[scene[k-1]][scene[k]];
-
-            if(distance < minDistance) {
-                bestScene = scene;
-                minDistance = distance;
-            }
-            return;
-        }
-        for (let j = i; j < arr.length; j++) {
-            [arr[i], arr[j]] = [arr[j], arr[i]];
-            findBestScene(i + 1, arr);
-            [arr[i], arr[j]] = [arr[j], arr[i]];
-        }
-    };      
-    findBestScene(0, MANDATORY)
-    
+    /* ------dummyTSP------ */
+    const { minDistance, bestScene } =  (dummyTSP === 0) ? permutation(D, SOURCE, [...MANDATORY], DESTINATION) :
+                                        (dummyTSP === 1) ? BnB(D, SOURCE, [...MANDATORY], DESTINATION) : 
+                                        (dummyTSP === 2) ? GA(D, SOURCE, [...MANDATORY], DESTINATION) :
+                                        { distance: null, path: null };
     // trace
     path = []
     for (let k = bestScene.length - 1; k > 0; k--) {
@@ -342,12 +305,13 @@ function Dijkstra() {
         }
     }
     path.push(bestScene[0]);
-    
-    return {distance: minDistance, path: path.reverse()};
+    path = path.reverse();
+
+    return {distance: minDistance, path: path};
 }
 
 
-function A_Star() {
+function A_Star(dummyTSP) {
     /* ---------init--------- */
     const N = GRAPH.listNodes.length,
         SOURCE = GRAPH.source,
@@ -440,33 +404,12 @@ function A_Star() {
             aStar(scene[i], scene[j]);
             aStar(scene[j], scene[i]);
         }
-            
 
-    console.log(D);
-
-    /* ------permutation------ */
-    let bestScene, minDistance = 9999999;
-    var findBestScene = function(i, arr) {
-        if (i === arr.length) {
-            let distance = 0,
-                scene = [SOURCE, ...arr, DESTINATION]
-
-            for (let k = 1; k < scene.length; k++)
-                distance += D[scene[k-1]][scene[k]];
-
-            if(distance < minDistance) {
-                bestScene = scene;
-                minDistance = distance;
-            }
-            return;
-        }
-        for (let j = i; j < arr.length; j++) {
-            [arr[i], arr[j]] = [arr[j], arr[i]];
-            findBestScene(i + 1, arr);
-            [arr[i], arr[j]] = [arr[j], arr[i]];
-        }
-    };      
-    findBestScene(0, MANDATORY)
+    /* ------dummyTSP------ */
+    const { minDistance, bestScene } =  (dummyTSP === 0) ? permutation(D, SOURCE, [...MANDATORY], DESTINATION) :
+                                        (dummyTSP === 1) ? BnB(D, SOURCE, [...MANDATORY], DESTINATION) : 
+                                        (dummyTSP === 2) ? GA(D, SOURCE, [...MANDATORY], DESTINATION) :
+                                        { distance: null, path: null };
     
     // trace
     path = []
@@ -481,6 +424,7 @@ function A_Star() {
         }
     }
     path.push(bestScene[0]);
-    
-    return {distance: minDistance, path: path.reverse()};
+    path = path.reverse();
+
+    return {distance: minDistance, path: path};
 }

@@ -15,6 +15,7 @@
     <link rel="stylesheet" href="index.css">
 
     <!-- import the required script -->
+    <script src="./src/map/dummyTSP.js"></script>
     <script src="./src/map/findPath.js"></script>
     <script src="./src/map/interactive.js"></script>
     <script src="./src/map/config.js"></script>
@@ -38,13 +39,24 @@
             <option value="0" selected >0</option>
             <option value="1">1</option>
             <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+            <option value="5">5</option>
+            <option value="6">6</option>
+            <option value="7">7</option>
+            <option value="8">8</option>
           </select>
         </div>
         <div class="boxselect button">Algorithm:
-          <select id="algorithm" >
-            <option value="0">Floyd-Warshall</option>
+          <select id="find-path" >
+            <option value="0">Floyd</option>
             <option value="1">Dijkstra</option>
             <option value="2">A*</option>
+          </select>
+          <select id="dummy-TSP" >
+            <option value="0">Permute</option>
+            <option value="1">BnB</option>
+            <option value="2">GA</option>
           </select>
         </div>
         <button id="run" class="button"> Run </button>
