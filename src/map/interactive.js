@@ -1,9 +1,9 @@
-let clickCNT = 0,
-    clickMAX = 2,
+let clickCNT = 0, 
+    clickMAX = 2, 
     listClickedNodes = [null, null, null, null, null],  
-    listNearestPoints = [null, null, null, null, null],
+    listNearestPoints = [null, null, null, null, null], 
     isActivedShowMap = false
-;
+; 
 
 function handleMapClick(map) {
 	map.on('click', (e) => {

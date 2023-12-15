@@ -21,9 +21,24 @@ document.getElementById('run').addEventListener("click", () => {
                                     { distance: null, path: null } ;
     const end = window.performance.now();
 
-    console.log('time: ', end - start, 'ms')
+    const executionTime = end - start;
+    console.log('time: ', executionTime, 'ms');
     console.log('path: ', path);
     console.log('distance: ', distance);
+
+    document.getElementById('console').innerHTML = 
+    `<table>
+        <tr>
+            <th>Distance (km)</th>
+            <th>Time (ms)</th>
+            <th>Path</th>
+        </tr>
+        <tr>
+            <td>${distance.toFixed(4)}</td>
+            <td>${executionTime}</td>
+            <td>${JSON.stringify(path)}</td>
+        </tr>
+     </table>`;
 
     if(distance < 9)
         showPath(path, true);

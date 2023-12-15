@@ -7,7 +7,23 @@ let GRAPH = {
     listNodes: [],
     listLinks: [],
 };
+function haversine(lat1, lon1, lat2, lon2) {
+    const R = 6371; // Bán kính trái đất tính bằng km
 
+    const dLat = (lat2 - lat1) * (Math.PI / 180);
+    const dLon = (lon2 - lon1) * (Math.PI / 180);
+
+    const a =
+        Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+        Math.cos(lat1 * (Math.PI / 180)) * Math.cos(lat2 * (Math.PI / 180)) *
+        Math.sin(dLon / 2) * Math.sin(dLon / 2);
+
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+    const distance = R * c; // Khoảng cách giữa hai điểm theo Công thức Haversine
+
+    return distance;
+}
 
 function findSatisfactionPoint(node) {
     // find
@@ -17,10 +33,7 @@ function findSatisfactionPoint(node) {
 
     for (let i=0; i<DATA.listExpandListNodes.length; i++) {
         tempNode = DATA.listExpandListNodes[i];
-        tempDistance = (
-            (tempNode.lat - node.lat) ** 2 +
-            (tempNode.lng - node.lng) ** 2 
-        ) ** 0.5
+        tempDistance = haversine(tempNode.lat, tempNode.lng, node.lat, node.lng);
 
         if (tempDistance < minDistance) {
             minDistance = tempDistance;
@@ -96,26 +109,32 @@ function initGraph() {
         for (const j in value) {
             v = value[j].list;
 
-            // sort for increasing order of distance to node i
-            for(let k=0; k<v.length; k++)
-                for(let l=k+1; l<v.length; l++) {
-                    
-                    let ikDistance = (
-                        (GRAPH.listNodes[i].lat - GRAPH.listNodes[v[k]].lat) ** 2 +
-                        (GRAPH.listNodes[i].lng - GRAPH.listNodes[v[k]].lng) ** 2 
-                    ) ** 0.5
+            // Sử dụng Công thức Haversine để tính khoảng cách trong vòng lặp
+            for (let k = 0; k < v.length; k++) {
+                for (let l = k + 1; l < v.length; l++) {
+                    const ikDistance = haversine(
+                        GRAPH.listNodes[i].lat,
+                        GRAPH.listNodes[i].lng,
+                        GRAPH.listNodes[v[k]].lat,
+                        GRAPH.listNodes[v[k]].lng
+                    );
 
-                    let ilDistance = (
-                        (GRAPH.listNodes[i].lat - GRAPH.listNodes[v[l]].lat) ** 2 +
-                        (GRAPH.listNodes[i].lng - GRAPH.listNodes[v[l]].lng) ** 2 
-                    ) ** 0.5
+                    const ilDistance = haversine(
+                        GRAPH.listNodes[i].lat,
+                        GRAPH.listNodes[i].lng,
+                        GRAPH.listNodes[v[l]].lat,
+                        GRAPH.listNodes[v[l]].lng
+                    );
 
                     if (ikDistance > ilDistance) {
+                        // Hoán đổi vị trí
                         let b = v[k];
                         v[k] = v[l];
                         v[l] = b;
                     }
                 }
+            }
+
             
             arr = [parseInt(i), ...value[j].list, parseInt(j)]
 
@@ -169,10 +188,8 @@ function Floyd_Warshall(dummyTSP) {
         links = GRAPH.listLinks[u]
         for (let k=0; k<links.length; k++) {
             let v = links[k];
-            W[u][v] = (
-                (GRAPH.listNodes[u].lat - GRAPH.listNodes[v].lat) ** 2 +
-                (GRAPH.listNodes[u].lng - GRAPH.listNodes[v].lng) ** 2 
-            ) ** 0.5
+            W[u][v] = haversine(GRAPH.listNodes[u].lat, GRAPH.listNodes[u].lng, GRAPH.listNodes[v].lat, GRAPH.listNodes[v].lng);
+
         }
     }
     let D = JSON.parse(JSON.stringify(W));
@@ -238,10 +255,12 @@ function Dijkstra(dummyTSP) {
         links = GRAPH.listLinks[u]
         for (let k=0; k<links.length; k++) {
             let v = links[k];
-            W[u][v] = (
-                (GRAPH.listNodes[u].lat - GRAPH.listNodes[v].lat) ** 2 +
-                (GRAPH.listNodes[u].lng - GRAPH.listNodes[v].lng) ** 2 
-            ) ** 0.5
+            W[u][v] = haversine(
+                GRAPH.listNodes[u].lat,
+                GRAPH.listNodes[u].lng,
+                GRAPH.listNodes[v].lat,
+                GRAPH.listNodes[v].lng
+            );
         }
     }
     let D = new Array(N).fill(INF).map(() => new Array(N).fill(INF));
@@ -306,8 +325,8 @@ function Dijkstra(dummyTSP) {
     }
     path.push(bestScene[0]);
     path = path.reverse();
-
     return {distance: minDistance, path: path};
+
 }
 
 
@@ -328,10 +347,12 @@ function A_Star(dummyTSP) {
         links = GRAPH.listLinks[u]
         for (let k=0; k<links.length; k++) {
             let v = links[k];
-            W[u][v] = (
-                (GRAPH.listNodes[u].lat - GRAPH.listNodes[v].lat) ** 2 +
-                (GRAPH.listNodes[u].lng - GRAPH.listNodes[v].lng) ** 2 
-            ) ** 0.5
+            W[u][v] = haversine(
+                GRAPH.listNodes[u].lat,
+                GRAPH.listNodes[u].lng,
+                GRAPH.listNodes[v].lat,
+                GRAPH.listNodes[v].lng
+            );
         }
     }
     let D = new Array(N).fill(INF).map(() => new Array(N).fill(INF));
